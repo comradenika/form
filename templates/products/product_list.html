@@ -4,42 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product List</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #eef2f7; padding: 30px; }
+        h1 { text-align: center; color: #2d3436; margin-bottom: 20px; font-size: 28px; }
+        .filter-bar { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 30px; }
+        .filter-bar a {
+            padding: 6px 16px; border-radius: 20px; text-decoration: none;
+            background: #dfe6e9; color: #2d3436; font-size: 14px; transition: background 0.2s;
+        }
+        .filter-bar a.active, .filter-bar a:hover { background: #0984e3; color: white; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; }
+        .card {
+            background: white; border-radius: 12px; overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08); transition: transform 0.2s;
+        }
+        .card:hover { transform: translateY(-4px); }
+        .card img { width: 100%; height: 180px; object-fit: cover; }
+        .card-body { padding: 16px; }
+        .card-body h3 { font-size: 17px; color: #2d3436; margin-bottom: 6px; }
+        .card-body .desc { font-size: 13px; color: #636e72; margin-bottom: 10px; }
+        .card-body .price { font-size: 20px; font-weight: bold; color: #00b894; }
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-top: 8px; }
+        .badge.in { background: #d4edda; color: #155724; }
+        .badge.out { background: #f8d7da; color: #721c24; }
+        .cat-tag { font-size: 11px; color: #0984e3; text-transform: uppercase; font-weight: 600; margin-bottom: 4px; }
+        .card-body a { text-decoration: none; color: inherit; }
+    </style>
 </head>
-<body style="font-family: Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px;">
+<body>
 
-    <h2 style="text-align: center; color: #333;">Product List</h2>
+    <h1>Products</h1>
 
-    <ul style="list-style-type: none; padding: 0; max-width: 600px; margin: 0 auto;">
-        {% for product in products %}
-        <li style="background: white; margin-bottom: 15px; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-            
-            <!-- Product Image -->
-            {% if product.images.first %}
-                <img src="{{ product.images.first.image.url }}" 
-                     style="width: 120px; border-radius: 6px; margin-bottom: 10px;">
-            {% endif %}
-
-            <!-- Product Name -->
-            <a href="{% url 'product_detail' product.pk %}" 
-               style="text-decoration: none; font-size: 18px; font-weight: bold; color: #2c3e50;">
-               {{ product.name }}
-            </a>
-
-            <!-- Price -->
-            <p style="margin: 8px 0; color: #555; font-size: 16px;">
-                ${{ product.price }}
-            </p>
-
-            <!-- Stock -->
-            {% if product.in_stock %}
-                <span style="color: green; font-weight: bold;">(In stock)</span>
-            {% else %}
-                <span style="color: red; font-weight: bold;">(Not in stock)</span>
-            {% endif %}
-            
-        </li>
+    <div class="filter-bar">
+        <a href="?" {% if not selected_category %}class="active"{% endif %}>All</a>
+        {% for val, label in categories %}
+            <a href="?category={{ val }}" {% if selected_category == val %}class="active"{% endif %}>{{ label }}</a>
         {% endfor %}
-    </ul>
+    </div>
+
+    <div class="grid">
+        {% for product in products %}
+        <div class="card">
+            {% if product.images.first %}
+                <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}">
+            {% else %}
+                <div style="height:180px; background:#dfe6e9; display:flex; align-items:center; justify-content:center; color:#b2bec3;">No image</div>
+            {% endif %}
+            <div class="card-body">
+                <div class="cat-tag">{{ product.get_category_display }}</div>
+                <a href="{% url 'product_detail' product.pk %}">
+                    <h3>{{ product.name }}</h3>
+                </a>
+                {% if product.description %}
+                    <p class="desc">{{ product.description|truncatechars:80 }}</p>
+                {% endif %}
+                <div class="price">${{ product.price }}</div>
+                {% if product.in_stock %}
+                    <span class="badge in">In stock</span>
+                {% else %}
+                    <span class="badge out">Out of stock</span>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+            <p style="text-align:center; color:#636e72;">No products found.</p>
+        {% endfor %}
+    </div>
 
 </body>
 </html>
