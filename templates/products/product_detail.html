@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.name }}</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 40px;">
+
+    <div style="max-width: 700px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+        
+        <h1 style="margin-bottom: 20px; color: #2c3e50;">
+            {{ product.name }}
+        </h1>
+
+        <p style="font-size: 22px; color: #27ae60; font-weight: bold; margin-bottom: 25px;">
+            ${{ product.price }}
+        </p>
+
+        <!-- Images Section -->
+        <div style="margin-bottom: 25px;">
+            {% for image in product.images.all %}
+                <div style="margin-bottom: 20px;">
+                    <img src="{{ image.image.url }}" 
+                         alt="{{ image.caption }}" 
+                         style="max-width: 100%; border-radius: 8px;">
+                    
+                    {% if image.caption %}
+                    <p style="color: #555; margin-top: 5px;">
+                        {{ image.caption }}
+                    </p>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <p>No images available.</p>
+            {% endfor %}
+        </div>
+
+        <a href="{% url 'product_list' %}" 
+           style="display: inline-block; padding: 10px 20px; background-color: #3498db; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">
+           Back to home page
+        </a>
+
+    </div>
+
+</body>
+</html>
